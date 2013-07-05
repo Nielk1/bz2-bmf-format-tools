@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.IO;
 
-namespace Nielk1
+namespace Nielk1.Formats.Battlezone.BMF
 {
     public class BmfFile
     {
@@ -51,51 +51,63 @@ namespace Nielk1
 
         public BmfFile(Stream fileStream)
         {
-            fontIdent = new byte[4];
-            fileStream.Read(fontIdent, 0, fontIdent.Length);
-            byte numChar = (byte)fileStream.ReadByte();
-            fontHeight = (byte)fileStream.ReadByte();
-            fontAscent = (byte)fileStream.ReadByte();
-            fontDescent = (byte)fileStream.ReadByte();
+            using (fileStream)
+            {
+                fontIdent = new byte[4];
+                fileStream.Read(fontIdent, 0, fontIdent.Length);
+                byte numChar = (byte)fileStream.ReadByte();
+                fontHeight = (byte)fileStream.ReadByte();
+                fontAscent = (byte)fileStream.ReadByte();
+                fontDescent = (byte)fileStream.ReadByte();
 
-            // read in data
-            CharHeader[] charHeaders = new CharHeader[(uint)numChar];
-            CharImage[] charImages = new CharImage[(uint)numChar];
-            for (uint x = 0; x < (uint)numChar; x++)
-            {
-                charHeaders[x].charValue = (byte)fileStream.ReadByte();
-                charHeaders[x].fullWidth = (byte)fileStream.ReadByte();
-                charHeaders[x].rectX0 = (byte)fileStream.ReadByte();
-                charHeaders[x].rectY0 = (byte)fileStream.ReadByte();
-                charHeaders[x].rectX1 = (byte)fileStream.ReadByte();
-                charHeaders[x].rectY1 = (byte)fileStream.ReadByte();
-            }
-            for (uint x = 0; x < (uint)numChar; x++)
-            {
-                charImages[x].charWidth = (byte)fileStream.ReadByte();
-                charImages[x].charHeight = (byte)fileStream.ReadByte();
-                charImages[x].charData = new byte[((uint)charImages[x].charWidth) * ((uint)charImages[x].charHeight)];
-                for (uint y = 0; y < charImages[x].charData.Length; y++)
+                // read in data
+                CharHeader[] charHeaders = new CharHeader[(uint)numChar];
+                CharImage[] charImages = new CharImage[(uint)numChar];
+                for (uint x = 0; x < (uint)numChar; x++)
                 {
-                    charImages[x].charData[y] = (byte)fileStream.ReadByte();
+                    charHeaders[x].charValue = (byte)fileStream.ReadByte();
+                    charHeaders[x].fullWidth = (byte)fileStream.ReadByte();
+                    charHeaders[x].rectX0 = (byte)fileStream.ReadByte();
+                    charHeaders[x].rectY0 = (byte)fileStream.ReadByte();
+                    charHeaders[x].rectX1 = (byte)fileStream.ReadByte();
+                    charHeaders[x].rectY1 = (byte)fileStream.ReadByte();
+                }
+                for (uint x = 0; x < (uint)numChar; x++)
+                {
+                    charImages[x].charWidth = (byte)fileStream.ReadByte();
+                    charImages[x].charHeight = (byte)fileStream.ReadByte();
+                    charImages[x].charData = new byte[((uint)charImages[x].charWidth) * ((uint)charImages[x].charHeight)];
+                    for (uint y = 0; y < charImages[x].charData.Length; y++)
+                    {
+                        charImages[x].charData[y] = (byte)fileStream.ReadByte();
+                    }
+                }
+
+                //re-roll data
+                characters = new Dictionary<byte, BmfCharacter>();
+                for (uint x = 0; x < (uint)numChar; x++)
+                {
+                    characters.Add(charHeaders[x].charValue,
+                        new BmfCharacter(
+                            charHeaders[x].fullWidth,
+                            charHeaders[x].rectX0,
+                            charHeaders[x].rectY0,
+                            charHeaders[x].rectX1,
+                            charHeaders[x].rectY1,
+                            charImages[x].charWidth,
+                            charImages[x].charHeight,
+                            charImages[x].charData));
                 }
             }
+        }
 
-            //re-roll data
-            characters = new Dictionary<byte, BmfCharacter>();
-            for (uint x = 0; x < (uint)numChar; x++)
-            {
-                characters.Add(charHeaders[x].charValue,
-                    new BmfCharacter(
-                        charHeaders[x].fullWidth,
-                        charHeaders[x].rectX0,
-                        charHeaders[x].rectY0,
-                        charHeaders[x].rectX1,
-                        charHeaders[x].rectY1,
-                        charImages[x].charWidth,
-                        charImages[x].charHeight,
-                        charImages[x].charData));
-            }
+        public BmfFile(byte fontHeight, byte fontAscent, byte fontDescent)
+        {
+            this.fontIdent = new byte[4] {(byte)'F',(byte)'O',(byte)'N',(byte)'T'};
+            this.fontHeight = fontHeight;
+            this.fontAscent = fontAscent;
+            this.fontDescent = fontDescent;
+            this.characters = new Dictionary<byte, BmfCharacter>();
         }
 
         public void Write(Stream output)

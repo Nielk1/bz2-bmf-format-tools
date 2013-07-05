@@ -8,9 +8,9 @@ using System.Text;
 using System.Windows.Forms;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
-using Nielk1;
+using Nielk1.Formats.Battlezone.BMF;
 
-namespace BZ2FontEditor
+namespace Nielk1.Tools.Battlezone.FontEditor
 {
     public partial class Form1 : Form
     {
@@ -42,6 +42,11 @@ namespace BZ2FontEditor
             {
                 // unload anything loaded?
                 listBox1.Items.Clear();
+
+                pictureBox1.Image = null;
+                pictureBox2.Image = null;
+                pictureBox3.Image = null;
+                imgWords.Image = null;
                 // />
 
                 FontFile = new BmfFile(System.IO.File.OpenRead(filename));
@@ -58,6 +63,8 @@ namespace BZ2FontEditor
                     listBox1.Items.Add(new BmfCharacterListItem(character));
                 }
                 listBox1.EndUpdate();
+
+                UpdateTextPreview();
             }
         }
 
@@ -174,7 +181,7 @@ namespace BZ2FontEditor
             }
         }
 
-        private void txtWords_TextChanged(object sender, EventArgs e)
+        private void UpdateTextPreview()
         {
             imgWords.Image = null;
 
@@ -212,65 +219,76 @@ namespace BZ2FontEditor
             int Width = counts.Max();
             int Height = lines.Length * FontFile.Height;
 
-            // wierd code here to fix stuff that hangs low
-            int extraHeight = 0;
-            for (int x = 0; x < lines.Last().Length; x++)
+            if (Height > 0 && Width > 0)
             {
-                BmfCharacter dataForChar = FontFile.Characters[(byte)lines.Last()[x]];
-                if (dataForChar != null)
+                // wierd code here to fix stuff that hangs low
+                int extraHeight = 0;
+                for (int x = 0; x < lines.Last().Length; x++)
                 {
-                    if (dataForChar.rectY1 > extraHeight)
-                    {
-                        extraHeight = dataForChar.rectY1;
-                    }
-                }
-            }
-            extraHeight -= FontFile.Height;
-            if (extraHeight > 0) Height += extraHeight;
-
-
-            Bitmap myImage = new Bitmap(Width, Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-
-            for (int lineNum = 0; lineNum < lines.Length; lineNum++)
-            {
-                int runningWidth = 0;
-                for (int wordNum = 0; wordNum < lines[lineNum].Length; wordNum++)
-                {
-                    BmfCharacter dataForChar = FontFile.Characters[(byte)lines[lineNum][wordNum]];
+                    BmfCharacter dataForChar = FontFile.Characters[(byte)lines.Last()[x]];
                     if (dataForChar != null)
                     {
-
-                        int LetterWidth = (int)(uint)dataForChar.charWidth;
-                        int LetterHeight = (int)(uint)dataForChar.charHeight;
-
-                        int LetterFullWidth = (int)(uint)dataForChar.fullWidth;
-                        int LetterXOffset = (int)(uint)dataForChar.rectX0;
-                        int LetterYOffset = (int)(uint)dataForChar.rectY0;
-
-                        for (int yInner = 0; yInner < LetterHeight; yInner++)
+                        if (dataForChar.rectY1 > extraHeight)
                         {
-                            for (int xInner = 0; xInner < LetterWidth; xInner++)
-                            {
-                                int z = dataForChar.charData[yInner * LetterWidth + xInner];
-                                if (runningWidth + LetterXOffset + xInner < Width && (lineNum * FontFile.Height) + LetterYOffset + yInner < Height)
-                                {
-                                    myImage.SetPixel(runningWidth + LetterXOffset + xInner,
-                                        (lineNum * FontFile.Height) + LetterYOffset + yInner,
-                                        Color.FromArgb(z, 0, 0, 0));
-                                }
-                                else
-                                {
-                                    Console.WriteLine("what the fuck");
-                                }
-                            }
+                            extraHeight = dataForChar.rectY1;
                         }
-
-                        runningWidth += LetterFullWidth;
                     }
                 }
-            }
+                extraHeight -= FontFile.Height;
+                if (extraHeight > 0) Height += extraHeight;
 
-            imgWords.Image = myImage;
+
+                Bitmap myImage = new Bitmap(Width, Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+
+                for (int lineNum = 0; lineNum < lines.Length; lineNum++)
+                {
+                    int runningWidth = 0;
+                    for (int wordNum = 0; wordNum < lines[lineNum].Length; wordNum++)
+                    {
+                        BmfCharacter dataForChar = FontFile.Characters[(byte)lines[lineNum][wordNum]];
+                        if (dataForChar != null)
+                        {
+
+                            int LetterWidth = (int)(uint)dataForChar.charWidth;
+                            int LetterHeight = (int)(uint)dataForChar.charHeight;
+
+                            int LetterFullWidth = (int)(uint)dataForChar.fullWidth;
+                            int LetterXOffset = (int)(uint)dataForChar.rectX0;
+                            int LetterYOffset = (int)(uint)dataForChar.rectY0;
+
+                            for (int yInner = 0; yInner < LetterHeight; yInner++)
+                            {
+                                for (int xInner = 0; xInner < LetterWidth; xInner++)
+                                {
+                                    int z = dataForChar.charData[yInner * LetterWidth + xInner];
+                                    if (runningWidth + LetterXOffset + xInner < Width && (lineNum * FontFile.Height) + LetterYOffset + yInner < Height)
+                                    {
+                                        myImage.SetPixel(runningWidth + LetterXOffset + xInner,
+                                            (lineNum * FontFile.Height) + LetterYOffset + yInner,
+                                            Color.FromArgb(z, 0, 0, 0));
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("what the fuck");
+                                    }
+                                }
+                            }
+
+                            runningWidth += LetterFullWidth;
+                        }
+                    }
+                }
+                imgWords.Image = myImage;
+            }
+            else
+            {
+                imgWords.Image = null;
+            }
+        }
+
+        private void txtWords_TextChanged(object sender, EventArgs e)
+        {
+            UpdateTextPreview();
         }
     }
 }

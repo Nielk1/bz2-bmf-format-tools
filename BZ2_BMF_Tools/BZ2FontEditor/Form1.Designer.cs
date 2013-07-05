@@ -1,4 +1,4 @@
-﻿namespace BZ2FontEditor
+﻿namespace Nielk1.Tools.Battlezone.FontEditor
 {
     partial class Form1
     {

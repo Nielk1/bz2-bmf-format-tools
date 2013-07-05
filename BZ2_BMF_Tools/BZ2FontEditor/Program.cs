@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 
-namespace BZ2FontEditor
+namespace Nielk1.Tools.Battlezone.FontEditor
 {
     static class Program
     {
