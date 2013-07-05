@@ -197,9 +197,9 @@ namespace Nielk1.Tools.Battlezone.FontEditor
                 BmfCharacter lastChar = null;
                 for (int y = 0; y < lines[x].Length; y++)
                 {
-                    BmfCharacter dataForChar = FontFile.Characters[(byte)lines[x][y]];
-                    if (dataForChar != null)
+                    if (FontFile.Characters.ContainsKey((byte)lines[x][y]))
                     {
+                        BmfCharacter dataForChar = FontFile.Characters[(byte)lines[x][y]];
                         lastChar = dataForChar;
                         counts[x] += dataForChar.fullWidth;
                     }
@@ -225,9 +225,9 @@ namespace Nielk1.Tools.Battlezone.FontEditor
                 int extraHeight = 0;
                 for (int x = 0; x < lines.Last().Length; x++)
                 {
-                    BmfCharacter dataForChar = FontFile.Characters[(byte)lines.Last()[x]];
-                    if (dataForChar != null)
+                    if (FontFile.Characters.ContainsKey((byte)lines.Last()[x]))
                     {
+                        BmfCharacter dataForChar = FontFile.Characters[(byte)lines.Last()[x]];
                         if (dataForChar.rectY1 > extraHeight)
                         {
                             extraHeight = dataForChar.rectY1;
@@ -245,9 +245,10 @@ namespace Nielk1.Tools.Battlezone.FontEditor
                     int runningWidth = 0;
                     for (int wordNum = 0; wordNum < lines[lineNum].Length; wordNum++)
                     {
-                        BmfCharacter dataForChar = FontFile.Characters[(byte)lines[lineNum][wordNum]];
-                        if (dataForChar != null)
+
+                        if (FontFile.Characters.ContainsKey((byte)lines[lineNum][wordNum]))
                         {
+                            BmfCharacter dataForChar = FontFile.Characters[(byte)lines[lineNum][wordNum]];
 
                             int LetterWidth = (int)(uint)dataForChar.charWidth;
                             int LetterHeight = (int)(uint)dataForChar.charHeight;
