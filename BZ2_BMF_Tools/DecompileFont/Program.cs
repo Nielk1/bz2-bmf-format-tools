@@ -58,11 +58,11 @@ namespace Nielk1.Tools.Battlezone.DecompileFont
 
                         string outputIDString = Convert.ToString(keyVal, 16).PadLeft(2, '0');
 
-                        //if (Height == 0 || Width == 0)
-                        //{
-                        //
-                        //}
-                        //else
+                        if (FullWidth == 0 || FullWidth == 0)
+                        {
+                            continue;
+                        }
+                        else
                         {
                             Bitmap tmpImage = new Bitmap(FullWidth, FullHeight, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
                             for (int y = 0; y < FullHeight; y++)
