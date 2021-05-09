@@ -31,6 +31,7 @@ namespace Nielk1.Tools.Battlezone.FontEditor
                 Label lbl = new Label();
                 lbl.Font = new Font(FontFamily.GenericMonospace, lbl.Font.Size);
                 lbl.Text = i.ToString().PadLeft(3) + "  " + Convert.ToString(i, 16).PadLeft(2) + "  " + (!char.IsControl((char)i) ? "" + (char)i : "");
+                lbl.Width = 85;
                 NumericUpDown nud = new NumericUpDown();
                 nud.Minimum = sbyte.MinValue;
                 nud.Maximum = sbyte.MaxValue;
