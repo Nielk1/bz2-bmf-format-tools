@@ -39,8 +39,8 @@ namespace Nielk1.Formats.Battlezone.BMF
 
         private struct CharExtension
         {
-            public sbyte extendedLeftOffset; // extended data
-            public sbyte[] extendedKerningPairs; // extended data
+            public sbyte leftOffset; // extended data
+            public sbyte[] kerningPairs; // extended data
         }
 
         //private FontHeader fontHeader;
@@ -93,17 +93,17 @@ namespace Nielk1.Formats.Battlezone.BMF
                 {
                     if (extendedFile == null)
                     {
-                        charExtension[x].extendedLeftOffset = (sbyte)0x00;
-                        charExtension[x].extendedKerningPairs = new sbyte[256];
+                        charExtension[x].leftOffset = (sbyte)0x00;
+                        charExtension[x].kerningPairs = new sbyte[256];
                         //for (uint y = 0; y < 256; y++)
                         //    charHeaders[x].extendedKerningPairs[y] = (sbyte)0x00;
                     }
                     else
                     {
-                        charExtension[x].extendedLeftOffset = (sbyte)extendedFile?.ReadByte();
-                        charExtension[x].extendedKerningPairs = new sbyte[256];
+                        charExtension[x].leftOffset = (sbyte)extendedFile?.ReadByte();
+                        charExtension[x].kerningPairs = new sbyte[256];
                         for (uint y = 0; y < 256; y++)
-                            charExtension[x].extendedKerningPairs[y] = (sbyte)extendedFile?.ReadByte();
+                            charExtension[x].kerningPairs[y] = (sbyte)extendedFile?.ReadByte();
                     }
                 }
 
@@ -121,8 +121,8 @@ namespace Nielk1.Formats.Battlezone.BMF
                             charImages[x].charWidth,
                             charImages[x].charHeight,
                             charImages[x].charData,
-                            charExtension[charHeaders[x].charValue].extendedLeftOffset,
-                            charExtension[charHeaders[x].charValue].extendedKerningPairs));
+                            charExtension[charHeaders[x].charValue].leftOffset,
+                            charExtension[charHeaders[x].charValue].kerningPairs));
                 }
             }
         }

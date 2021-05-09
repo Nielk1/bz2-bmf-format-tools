@@ -17,9 +17,30 @@ namespace Nielk1.Tools.Battlezone.FontEditor
         private String filename;
         private BmfFile FontFile;
 
+        private NumericUpDown[] ExtendedKerningEdit;
+
         public Form1()
         {
             InitializeComponent();
+
+            tableLayoutPanel1.SuspendLayout();
+            tableLayoutPanel1.Controls.Clear();
+            ExtendedKerningEdit = new NumericUpDown[256];
+            for (int i = 0; i < 256; i++)
+            {
+                Label lbl = new Label();
+                lbl.Font = new Font(FontFamily.GenericMonospace, lbl.Font.Size);
+                lbl.Text = i.ToString().PadLeft(3) + "  " + Convert.ToString(i, 16).PadLeft(2) + "  " + (!char.IsControl((char)i) ? "" + (char)i : "");
+                NumericUpDown nud = new NumericUpDown();
+                nud.Minimum = sbyte.MinValue;
+                nud.Maximum = sbyte.MaxValue;
+                nud.Width = 49;
+                tableLayoutPanel1.Controls.Add(lbl, 0, i);
+                tableLayoutPanel1.Controls.Add(nud, 1, i);
+                ExtendedKerningEdit[i] = nud;
+            }
+            tableLayoutPanel1.ResumeLayout();
+
         }
 
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
@@ -80,6 +101,10 @@ namespace Nielk1.Tools.Battlezone.FontEditor
             int FullHeight = (int)(uint)FontFile.Height;
             int XOffset = (int)(uint)item.Value.rectX0;
             int YOffset = (int)(uint)item.Value.rectY0;
+
+            nudExtendedLeftOffset.Value = item.Value.extendedLeftOffset;
+            for (int i = 0; i < 256; i++)
+                ExtendedKerningEdit[i].Value = item.Value.extendedKerningPairs[i];
 
             FullWidth = Math.Max(FullWidth, (int)(uint)item.Value.rectX1);
             FullHeight = Math.Max(FullHeight, (int)(uint)item.Value.rectY1);

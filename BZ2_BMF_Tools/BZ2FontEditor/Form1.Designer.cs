@@ -63,6 +63,10 @@
             this.label11 = new System.Windows.Forms.Label();
             this.txtWords = new System.Windows.Forms.TextBox();
             this.imgWords = new System.Windows.Forms.PictureBox();
+            this.panel1 = new System.Windows.Forms.Panel();
+            this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
+            this.label12 = new System.Windows.Forms.Label();
+            this.nudExtendedLeftOffset = new System.Windows.Forms.NumericUpDown();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.flowLayoutPanel1.SuspendLayout();
@@ -78,6 +82,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.nudRecY0)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudRecY1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.imgWords)).BeginInit();
+            this.panel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.nudExtendedLeftOffset)).BeginInit();
             this.SuspendLayout();
             // 
             // menuStrip1
@@ -86,7 +92,7 @@
             this.fileToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(361, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(384, 24);
             this.menuStrip1.TabIndex = 0;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -187,7 +193,7 @@
             // pictureBox1
             // 
             this.pictureBox1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.pictureBox1.Location = new System.Drawing.Point(3, 79);
+            this.pictureBox1.Location = new System.Drawing.Point(79, 3);
             this.pictureBox1.Name = "pictureBox1";
             this.pictureBox1.Size = new System.Drawing.Size(32, 32);
             this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
@@ -201,10 +207,9 @@
             this.flowLayoutPanel1.Controls.Add(this.pictureBox3);
             this.flowLayoutPanel1.Controls.Add(this.pictureBox2);
             this.flowLayoutPanel1.Controls.Add(this.pictureBox1);
-            this.flowLayoutPanel1.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
-            this.flowLayoutPanel1.Location = new System.Drawing.Point(186, 144);
+            this.flowLayoutPanel1.Location = new System.Drawing.Point(186, 288);
             this.flowLayoutPanel1.Name = "flowLayoutPanel1";
-            this.flowLayoutPanel1.Size = new System.Drawing.Size(162, 199);
+            this.flowLayoutPanel1.Size = new System.Drawing.Size(185, 55);
             this.flowLayoutPanel1.TabIndex = 15;
             // 
             // pictureBox3
@@ -220,7 +225,7 @@
             // pictureBox2
             // 
             this.pictureBox2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.pictureBox2.Location = new System.Drawing.Point(3, 41);
+            this.pictureBox2.Location = new System.Drawing.Point(41, 3);
             this.pictureBox2.Name = "pictureBox2";
             this.pictureBox2.Size = new System.Drawing.Size(32, 32);
             this.pictureBox2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
@@ -414,7 +419,7 @@
             this.txtWords.Location = new System.Drawing.Point(12, 349);
             this.txtWords.Multiline = true;
             this.txtWords.Name = "txtWords";
-            this.txtWords.Size = new System.Drawing.Size(336, 81);
+            this.txtWords.Size = new System.Drawing.Size(359, 81);
             this.txtWords.TabIndex = 33;
             this.txtWords.TextChanged += new System.EventHandler(this.txtWords_TextChanged);
             // 
@@ -426,15 +431,70 @@
             this.imgWords.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.imgWords.Location = new System.Drawing.Point(12, 436);
             this.imgWords.Name = "imgWords";
-            this.imgWords.Size = new System.Drawing.Size(336, 69);
+            this.imgWords.Size = new System.Drawing.Size(359, 69);
             this.imgWords.TabIndex = 34;
             this.imgWords.TabStop = false;
+            // 
+            // panel1
+            // 
+            this.panel1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.panel1.AutoScroll = true;
+            this.panel1.Controls.Add(this.tableLayoutPanel1);
+            this.panel1.Location = new System.Drawing.Point(186, 169);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(185, 113);
+            this.panel1.TabIndex = 35;
+            // 
+            // tableLayoutPanel1
+            // 
+            this.tableLayoutPanel1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.tableLayoutPanel1.AutoSize = true;
+            this.tableLayoutPanel1.ColumnCount = 2;
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            this.tableLayoutPanel1.Location = new System.Drawing.Point(3, 3);
+            this.tableLayoutPanel1.Name = "tableLayoutPanel1";
+            this.tableLayoutPanel1.RowCount = 1;
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(162, 113);
+            this.tableLayoutPanel1.TabIndex = 0;
+            // 
+            // label12
+            // 
+            this.label12.AutoSize = true;
+            this.label12.Location = new System.Drawing.Point(186, 145);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(56, 13);
+            this.label12.TabIndex = 29;
+            this.label12.Text = "Left Offset";
+            // 
+            // nudExtendedLeftOffset
+            // 
+            this.nudExtendedLeftOffset.Location = new System.Drawing.Point(300, 143);
+            this.nudExtendedLeftOffset.Maximum = new decimal(new int[] {
+            127,
+            0,
+            0,
+            0});
+            this.nudExtendedLeftOffset.Minimum = new decimal(new int[] {
+            128,
+            0,
+            0,
+            -2147483648});
+            this.nudExtendedLeftOffset.Name = "nudExtendedLeftOffset";
+            this.nudExtendedLeftOffset.Size = new System.Drawing.Size(49, 20);
+            this.nudExtendedLeftOffset.TabIndex = 28;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(361, 517);
+            this.ClientSize = new System.Drawing.Size(384, 517);
+            this.Controls.Add(this.label12);
+            this.Controls.Add(this.panel1);
+            this.Controls.Add(this.nudExtendedLeftOffset);
             this.Controls.Add(this.imgWords);
             this.Controls.Add(this.txtWords);
             this.Controls.Add(this.label11);
@@ -483,6 +543,9 @@
             ((System.ComponentModel.ISupportInitialize)(this.nudRecY0)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudRecY1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.imgWords)).EndInit();
+            this.panel1.ResumeLayout(false);
+            this.panel1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.nudExtendedLeftOffset)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -529,6 +592,10 @@
         private System.Windows.Forms.PictureBox pictureBox3;
         private System.Windows.Forms.TextBox txtWords;
         private System.Windows.Forms.PictureBox imgWords;
+        private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.Label label12;
+        private System.Windows.Forms.NumericUpDown nudExtendedLeftOffset;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
     }
 }
 
