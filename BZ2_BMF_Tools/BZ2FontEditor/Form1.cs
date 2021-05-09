@@ -49,7 +49,9 @@ namespace Nielk1.Tools.Battlezone.FontEditor
                 imgWords.Image = null;
                 // />
 
-                FontFile = new BmfFile(System.IO.File.OpenRead(filename));
+                string ExtendedFile = System.IO.Path.ChangeExtension(filename, ".bm2");
+
+                FontFile = System.IO.File.Exists(ExtendedFile) ? new BmfFile(System.IO.File.OpenRead(filename), System.IO.File.OpenRead(ExtendedFile)) : new BmfFile(System.IO.File.OpenRead(filename));
 
                 lblFontIdent.Text = FontFile.Indent;
                 lblNumChar.Text = "" + (uint)FontFile.CharCount;
@@ -255,10 +257,10 @@ namespace Nielk1.Tools.Battlezone.FontEditor
 
                     for (int lineNum = 0; lineNum < lines.Length; lineNum++)
                     {
+                        int CleanDrawOffset = 0; // new line means no redraws
                         int runningWidth = 0;
                         for (int wordNum = 0; wordNum < lines[lineNum].Length; wordNum++)
                         {
-
                             if (FontFile.Characters.ContainsKey((byte)lines[lineNum][wordNum]))
                             {
                                 BmfCharacter dataForChar = FontFile.Characters[(byte)lines[lineNum][wordNum]];
@@ -270,6 +272,18 @@ namespace Nielk1.Tools.Battlezone.FontEditor
                                 int LetterXOffset = (int)(uint)dataForChar.rectX0;
                                 int LetterYOffset = (int)(uint)dataForChar.rectY0;
 
+                                if (wordNum == 0)
+                                {
+                                    runningWidth -= dataForChar.extendedLeftOffset;
+                                }
+                                else
+                                {
+                                    runningWidth += dataForChar.extendedLeftOffset;
+                                }
+                                if (runningWidth > CleanDrawOffset)
+                                    CleanDrawOffset = runningWidth;
+
+                                bool DrawOver = CleanDrawOffset > runningWidth;
                                 for (int yInner = 0; yInner < LetterHeight; yInner++)
                                 {
                                     for (int xInner = 0; xInner < LetterWidth; xInner++)
@@ -277,9 +291,12 @@ namespace Nielk1.Tools.Battlezone.FontEditor
                                         int z = dataForChar.charData[yInner * LetterWidth + xInner];
                                         if (runningWidth + LetterXOffset + xInner < Width && (lineNum * FontFile.Height) + LetterYOffset + yInner < Height)
                                         {
+                                            int DrawOverColor = DrawOver
+                                                ? myImage.GetPixel(runningWidth + LetterXOffset + xInner, (lineNum * FontFile.Height) + LetterYOffset + yInner).A
+                                                : 0;
                                             myImage.SetPixel(runningWidth + LetterXOffset + xInner,
                                                 (lineNum * FontFile.Height) + LetterYOffset + yInner,
-                                                Color.FromArgb(z, 0, 0, 0));
+                                                Color.FromArgb(Math.Min(DrawOverColor + z, 255), 0, 0, 0));
                                         }
                                         else
                                         {
@@ -289,6 +306,14 @@ namespace Nielk1.Tools.Battlezone.FontEditor
                                 }
 
                                 runningWidth += LetterFullWidth;
+                                if (runningWidth > CleanDrawOffset)
+                                    CleanDrawOffset = runningWidth;
+
+                                byte nextForKerning = (wordNum + 1) < lines[lineNum].Length ? (byte)lines[lineNum][(wordNum + 1)] : (byte)'A';
+                                int KerningOffset = dataForChar.extendedKerningPairs[nextForKerning];
+                                runningWidth += KerningOffset;
+                                if (runningWidth > CleanDrawOffset)
+                                    CleanDrawOffset = runningWidth;
                             }
                         }
                     }

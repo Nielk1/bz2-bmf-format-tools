@@ -37,6 +37,12 @@ namespace Nielk1.Formats.Battlezone.BMF
             public byte[] charData;// character pixels
         };
 
+        private struct CharExtension
+        {
+            public sbyte extendedLeftOffset; // extended data
+            public sbyte[] extendedKerningPairs; // extended data
+        }
+
         //private FontHeader fontHeader;
         //public/*private*/ CharHeader[] charHeaders;
         //public/*private*/ CharImage[] charImages;
@@ -49,7 +55,7 @@ namespace Nielk1.Formats.Battlezone.BMF
 
         private Dictionary<byte, BmfCharacter> characters;
 
-        public BmfFile(Stream fileStream)
+        public BmfFile(Stream fileStream, Stream extendedFile = null)
         {
             using (fileStream)
             {
@@ -63,6 +69,7 @@ namespace Nielk1.Formats.Battlezone.BMF
                 // read in data
                 CharHeader[] charHeaders = new CharHeader[(uint)numChar];
                 CharImage[] charImages = new CharImage[(uint)numChar];
+                CharExtension[] charExtension = new CharExtension[256];
                 for (uint x = 0; x < (uint)numChar; x++)
                 {
                     charHeaders[x].charValue = (byte)fileStream.ReadByte();
@@ -82,6 +89,23 @@ namespace Nielk1.Formats.Battlezone.BMF
                         charImages[x].charData[y] = (byte)fileStream.ReadByte();
                     }
                 }
+                for (uint x = 0; x < 256; x++)
+                {
+                    if (extendedFile == null)
+                    {
+                        charExtension[x].extendedLeftOffset = (sbyte)0x00;
+                        charExtension[x].extendedKerningPairs = new sbyte[256];
+                        //for (uint y = 0; y < 256; y++)
+                        //    charHeaders[x].extendedKerningPairs[y] = (sbyte)0x00;
+                    }
+                    else
+                    {
+                        charExtension[x].extendedLeftOffset = (sbyte)extendedFile?.ReadByte();
+                        charExtension[x].extendedKerningPairs = new sbyte[256];
+                        for (uint y = 0; y < 256; y++)
+                            charExtension[x].extendedKerningPairs[y] = (sbyte)extendedFile?.ReadByte();
+                    }
+                }
 
                 //re-roll data
                 characters = new Dictionary<byte, BmfCharacter>();
@@ -96,7 +120,9 @@ namespace Nielk1.Formats.Battlezone.BMF
                             charHeaders[x].rectY1,
                             charImages[x].charWidth,
                             charImages[x].charHeight,
-                            charImages[x].charData));
+                            charImages[x].charData,
+                            charExtension[charHeaders[x].charValue].extendedLeftOffset,
+                            charExtension[charHeaders[x].charValue].extendedKerningPairs));
                 }
             }
         }
@@ -178,7 +204,10 @@ namespace Nielk1.Formats.Battlezone.BMF
         public byte charHeight;// height of the character image
         public byte[] charData;// character pixels
 
-        public BmfCharacter(byte fullWidth, byte rectX0, byte rectY0, byte rectX1, byte rectY1, byte charWidth, byte charHeight, byte[] charData)
+        public sbyte extendedLeftOffset; // extended data
+        public sbyte[] extendedKerningPairs; // extended data
+
+        public BmfCharacter(byte fullWidth, byte rectX0, byte rectY0, byte rectX1, byte rectY1, byte charWidth, byte charHeight, byte[] charData, sbyte extendedLeftOffset, sbyte[] extendedKerningPairs)
         {
             this.fullWidth = fullWidth;
             this.rectX0 = rectX0;
@@ -188,6 +217,8 @@ namespace Nielk1.Formats.Battlezone.BMF
             this.charWidth = charWidth;
             this.charHeight = charHeight;
             this.charData = charData;
+            this.extendedLeftOffset = extendedLeftOffset;
+            this.extendedKerningPairs = extendedKerningPairs;
         }
     }
 }
