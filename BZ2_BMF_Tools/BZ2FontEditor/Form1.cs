@@ -283,7 +283,7 @@ namespace Nielk1.Tools.Battlezone.FontEditor
                                         }
                                         else
                                         {
-                                            Console.WriteLine("what the fuck");
+                                            Console.WriteLine("Pixel outside valid range");
                                         }
                                     }
                                 }
