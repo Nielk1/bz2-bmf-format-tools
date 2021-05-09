@@ -183,6 +183,8 @@ namespace Nielk1.Tools.Battlezone.FontEditor
 
         private void UpdateTextPreview()
         {
+            if (FontFile != null)
+        {
             imgWords.Image = null;
 
             string containedText = txtWords.Text;
@@ -285,6 +287,7 @@ namespace Nielk1.Tools.Battlezone.FontEditor
             {
                 imgWords.Image = null;
             }
+        }
         }
 
         private void txtWords_TextChanged(object sender, EventArgs e)
