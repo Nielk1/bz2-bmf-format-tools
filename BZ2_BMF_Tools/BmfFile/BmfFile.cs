@@ -136,15 +136,15 @@ namespace Nielk1.Formats.Battlezone.BMF
             this.characters = new Dictionary<byte, BmfCharacter>();
         }
 
-        public void Write(Stream output)
+        public void Write(Stream output, Stream output2)
         {
-            output.Write(fontIdent,0,4);
+            output.Write(fontIdent, 0, 4);
             output.WriteByte(CharCount);
             output.WriteByte(fontHeight);
             output.WriteByte(fontAscent);
             output.WriteByte(fontDescent);
 
-            foreach(KeyValuePair<byte, BmfCharacter> character in characters)
+            foreach (KeyValuePair<byte, BmfCharacter> character in characters)
             {
                 output.WriteByte(character.Key);
                 output.WriteByte(character.Value.fullWidth);
@@ -159,6 +159,30 @@ namespace Nielk1.Formats.Battlezone.BMF
                 output.WriteByte(character.Value.charHeight);
                 output.Write(character.Value.charData, 0, character.Value.charData.Length);
             }
+
+            if (output2 != null)
+            {
+                for (int i = 0; i < 256; i++)
+                {
+                    if (!characters.ContainsKey((byte)i))
+                    {
+                        output2.WriteByte(0x00);
+                        continue;
+                    }
+                    output2.WriteByte((byte)characters[(byte)i].extendedLeftOffset);
+                }
+                for (int i = 0; i < 256; i++)
+                {
+                    if (!characters.ContainsKey((byte)i))
+                    {
+                        for (int j = 0; i < 256; j++)
+                            output2.WriteByte(0x00);
+                        continue;
+                    }
+                    for (int j = 0; i < 256; j++)
+                        output2.WriteByte((byte)characters[(byte)i].extendedKerningPairs[j]);
+                }
+            }
         }
 
         public string Indent
@@ -168,26 +192,29 @@ namespace Nielk1.Formats.Battlezone.BMF
 
         public byte CharCount
         {
-            //get { return numChar; }
             get { return (byte)characters.Count; }
         }
 
         public byte Height
         {
             get { return fontHeight; }
+            set { fontHeight = value; }
         }
         public byte Ascent
         {
             get { return fontAscent; }
+            set { fontAscent = value; }
         }
         public byte Descent
         {
             get { return fontDescent; }
+            set { fontDescent = value; }
         }
 
         public Dictionary<byte, BmfCharacter> Characters
         {
             get { return characters; }
+            set { characters = value; }
         }
     }
 

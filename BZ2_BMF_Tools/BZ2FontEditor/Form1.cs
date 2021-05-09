@@ -36,6 +36,8 @@ namespace Nielk1.Tools.Battlezone.FontEditor
                 nud.Minimum = sbyte.MinValue;
                 nud.Maximum = sbyte.MaxValue;
                 nud.Width = 49;
+                nud.Tag = $"Kerning_{i}";
+                nud.ValueChanged += nudFValueChanged_ValueChanged;
                 tableLayoutPanel1.Controls.Add(lbl, 0, i);
                 tableLayoutPanel1.Controls.Add(nud, 1, i);
                 ExtendedKerningEdit[i] = nud;
@@ -355,6 +357,102 @@ namespace Nielk1.Tools.Battlezone.FontEditor
         private void txtWords_TextChanged(object sender, EventArgs e)
         {
             UpdateTextPreview();
+        }
+
+
+        private void nudFValueChanged_ValueChanged(object sender, EventArgs e)
+        {
+            if (FontFile == null)
+                return;
+
+            NumericUpDown nud = sender as NumericUpDown;
+            if (nud == null)
+                return;
+
+            if (nud == nudFontAscent)
+            {
+                FontFile.Ascent = (byte)nud.Value;
+                UpdateTextPreview();
+                return;
+            }
+            if (nud == nudFontDescent)
+            {
+                FontFile.Descent = (byte)nud.Value;
+                UpdateTextPreview();
+                return;
+            }
+            if (nud == nudFontHeight)
+            {
+
+                FontFile.Height = (byte)nud.Value;
+                UpdateTextPreview();
+                return;
+            }
+
+            BmfCharacterListItem item = (BmfCharacterListItem)listBox1.SelectedItem;
+            if (item == null)
+                return;
+            if (nud == nudCharValue)
+            {
+                // prevent editing this, at least for now
+                nudCharValue.Value = item.Key;
+                return;
+            }
+            if (nud == nudFullWidth)
+            {
+                item.Value.fullWidth = (byte)nud.Value;
+                UpdateTextPreview();
+                return;
+            }
+            if (nud == nudRecX0)
+            {
+                item.Value.rectX0 = (byte)nud.Value;
+                UpdateTextPreview();
+                return;
+            }
+            if (nud == nudRecX1)
+            {
+                item.Value.rectX1 = (byte)nud.Value;
+                UpdateTextPreview();
+                return;
+            }
+            if (nud == nudRecY0)
+            {
+                item.Value.rectY0 = (byte)nud.Value;
+                UpdateTextPreview();
+                return;
+            }
+            if (nud == nudRecY1)
+            {
+                item.Value.rectY1 = (byte)nud.Value;
+                UpdateTextPreview();
+                return;
+            }
+
+            if (nud == nudExtendedLeftOffset)
+            {
+                item.Value.extendedLeftOffset = (sbyte)nud.Value;
+                UpdateTextPreview();
+                return;
+            }
+            if (nud.Tag != null)
+            {
+                string tag = nud.Tag as string;
+                if(tag != null)
+                {
+                    string[] splt = tag.Split('_');
+                    if(splt[0] == "Kerning" && splt.Length > 1)
+                    {
+                        int tInt = 0;
+                        if (int.TryParse(splt[1], out tInt))
+                        {
+                            item.Value.extendedKerningPairs[tInt] = (sbyte)nud.Value;
+                            UpdateTextPreview();
+                            return;
+                        }
+                    }
+                }
+            }
         }
     }
 }

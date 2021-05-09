@@ -68,8 +68,8 @@
             this.label12 = new System.Windows.Forms.Label();
             this.nudExtendedLeftOffset = new System.Windows.Forms.NumericUpDown();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
-            this.splitContainer2 = new System.Windows.Forms.SplitContainer();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.splitContainer2 = new System.Windows.Forms.SplitContainer();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.flowLayoutPanel1.SuspendLayout();
@@ -91,11 +91,11 @@
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
+            this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).BeginInit();
             this.splitContainer2.Panel1.SuspendLayout();
             this.splitContainer2.Panel2.SuspendLayout();
             this.splitContainer2.SuspendLayout();
-            this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
             // menuStrip1
@@ -275,6 +275,7 @@
             this.nudFontHeight.Name = "nudFontHeight";
             this.nudFontHeight.Size = new System.Drawing.Size(49, 20);
             this.nudFontHeight.TabIndex = 18;
+            this.nudFontHeight.ValueChanged += new System.EventHandler(this.nudFValueChanged_ValueChanged);
             // 
             // nudFontAscent
             // 
@@ -287,6 +288,7 @@
             this.nudFontAscent.Name = "nudFontAscent";
             this.nudFontAscent.Size = new System.Drawing.Size(49, 20);
             this.nudFontAscent.TabIndex = 19;
+            this.nudFontAscent.ValueChanged += new System.EventHandler(this.nudFValueChanged_ValueChanged);
             // 
             // nudFontDescent
             // 
@@ -299,6 +301,7 @@
             this.nudFontDescent.Name = "nudFontDescent";
             this.nudFontDescent.Size = new System.Drawing.Size(49, 20);
             this.nudFontDescent.TabIndex = 20;
+            this.nudFontDescent.ValueChanged += new System.EventHandler(this.nudFValueChanged_ValueChanged);
             // 
             // nudCharValue
             // 
@@ -311,6 +314,7 @@
             this.nudCharValue.Name = "nudCharValue";
             this.nudCharValue.Size = new System.Drawing.Size(49, 20);
             this.nudCharValue.TabIndex = 21;
+            this.nudCharValue.ValueChanged += new System.EventHandler(this.nudFValueChanged_ValueChanged);
             // 
             // nudFullWidth
             // 
@@ -323,6 +327,7 @@
             this.nudFullWidth.Name = "nudFullWidth";
             this.nudFullWidth.Size = new System.Drawing.Size(49, 20);
             this.nudFullWidth.TabIndex = 22;
+            this.nudFullWidth.ValueChanged += new System.EventHandler(this.nudFValueChanged_ValueChanged);
             // 
             // nudRecX0
             // 
@@ -335,6 +340,7 @@
             this.nudRecX0.Name = "nudRecX0";
             this.nudRecX0.Size = new System.Drawing.Size(49, 20);
             this.nudRecX0.TabIndex = 23;
+            this.nudRecX0.ValueChanged += new System.EventHandler(this.nudFValueChanged_ValueChanged);
             // 
             // nudRecX1
             // 
@@ -347,6 +353,7 @@
             this.nudRecX1.Name = "nudRecX1";
             this.nudRecX1.Size = new System.Drawing.Size(49, 20);
             this.nudRecX1.TabIndex = 24;
+            this.nudRecX1.ValueChanged += new System.EventHandler(this.nudFValueChanged_ValueChanged);
             // 
             // nudRecY0
             // 
@@ -359,6 +366,7 @@
             this.nudRecY0.Name = "nudRecY0";
             this.nudRecY0.Size = new System.Drawing.Size(49, 20);
             this.nudRecY0.TabIndex = 25;
+            this.nudRecY0.ValueChanged += new System.EventHandler(this.nudFValueChanged_ValueChanged);
             // 
             // nudRecY1
             // 
@@ -371,6 +379,7 @@
             this.nudRecY1.Name = "nudRecY1";
             this.nudRecY1.Size = new System.Drawing.Size(49, 20);
             this.nudRecY1.TabIndex = 26;
+            this.nudRecY1.ValueChanged += new System.EventHandler(this.nudFValueChanged_ValueChanged);
             // 
             // label6
             // 
@@ -475,7 +484,7 @@
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
             this.tableLayoutPanel1.RowCount = 1;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(147, 113);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(130, 113);
             this.tableLayoutPanel1.TabIndex = 0;
             // 
             // label12
@@ -503,6 +512,7 @@
             this.nudExtendedLeftOffset.Name = "nudExtendedLeftOffset";
             this.nudExtendedLeftOffset.Size = new System.Drawing.Size(49, 20);
             this.nudExtendedLeftOffset.TabIndex = 28;
+            this.nudExtendedLeftOffset.ValueChanged += new System.EventHandler(this.nudFValueChanged_ValueChanged);
             // 
             // splitContainer1
             // 
@@ -551,6 +561,19 @@
             this.splitContainer1.SplitterDistance = 355;
             this.splitContainer1.TabIndex = 36;
             // 
+            // groupBox1
+            // 
+            this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox1.Controls.Add(this.panel1);
+            this.groupBox1.Location = new System.Drawing.Point(165, 149);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(185, 137);
+            this.groupBox1.TabIndex = 36;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "Kerning Pair";
+            // 
             // splitContainer2
             // 
             this.splitContainer2.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -568,19 +591,6 @@
             this.splitContainer2.Size = new System.Drawing.Size(362, 199);
             this.splitContainer2.SplitterDistance = 67;
             this.splitContainer2.TabIndex = 37;
-            // 
-            // groupBox1
-            // 
-            this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.groupBox1.Controls.Add(this.panel1);
-            this.groupBox1.Location = new System.Drawing.Point(165, 149);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(185, 137);
-            this.groupBox1.TabIndex = 36;
-            this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Kerning Pair";
             // 
             // Form1
             // 
@@ -616,12 +626,12 @@
             this.splitContainer1.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
+            this.groupBox1.ResumeLayout(false);
             this.splitContainer2.Panel1.ResumeLayout(false);
             this.splitContainer2.Panel1.PerformLayout();
             this.splitContainer2.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).EndInit();
             this.splitContainer2.ResumeLayout(false);
-            this.groupBox1.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
