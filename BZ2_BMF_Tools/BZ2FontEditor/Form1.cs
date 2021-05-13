@@ -369,6 +369,8 @@ namespace Nielk1.Tools.Battlezone.FontEditor
                 //using (Bitmap canvasDummy = new Bitmap(1, 1))
                 //using (Graphics gDummy = Graphics.FromImage(canvasDummy))
                 {
+                    Dictionary<byte, int> BumpsNeeded = new Dictionary<byte, int>();
+
                     for (int i = 0; i < 256; i++)
                     {
                         //if (!char.IsControl((char)i))
@@ -413,7 +415,7 @@ namespace Nielk1.Tools.Battlezone.FontEditor
 
                                 int LeftPad = 0;
                                 int gmptGlyphOrigin_x = ImageMetric.gmptGlyphOrigin.x;
-                                int gmptGlyphOrigin_y = ImageMetric.gmptGlyphOrigin.y;
+                                int gmptGlyphOrigin_y = heightPixel - ImageMetric.gmptGlyphOrigin.y;
                                 int characterWidth = ImageMetric.gmCellIncX;
                                 if (gmptGlyphOrigin_x < 0)
                                 {
@@ -421,13 +423,18 @@ namespace Nielk1.Tools.Battlezone.FontEditor
                                     gmptGlyphOrigin_x = 0; // shift us over back to 0
                                     characterWidth -= LeftPad; // apply our negative offset to the extended left pad to correct the position
                                 }
+                                if (gmptGlyphOrigin_y < 0)
+                                {
+                                    BumpsNeeded[(byte)i] = -gmptGlyphOrigin_y; // preserve the bumps for when we loop back over all the items to push them down
+                                    gmptGlyphOrigin_y = 0; // shift us over back to 0
+                                }
 
                                 BmfCharacter Character = new BmfCharacter(
                                     (byte)characterWidth, // entire width of character
                                     (byte)gmptGlyphOrigin_x, // black area x0
-                                    (byte)(heightPixel - gmptGlyphOrigin_y), // black area y0
+                                    (byte)gmptGlyphOrigin_y, // black area y0
                                     (byte)(gmptGlyphOrigin_x + (BlackZone?.Width ?? 0)), // black area x1
-                                    (byte)((heightPixel - gmptGlyphOrigin_y) + (BlackZone?.Height ?? 0)), // black area y1
+                                    (byte)(gmptGlyphOrigin_y + (BlackZone?.Height ?? 0)), // black area y1
                                     (byte)(BlackZone?.Width ?? 0), // black area width
                                     (byte)(BlackZone?.Height ?? 0), // black area height
                                     rawData, // black area graphics
@@ -436,6 +443,20 @@ namespace Nielk1.Tools.Battlezone.FontEditor
                                 localFontFile.Characters.Add((byte)i, Character);
                             }
                         }
+                    }
+
+                    int maxHeightOffset = 0;
+                    foreach(var off in BumpsNeeded)
+                        maxHeightOffset = Math.Max(maxHeightOffset, off.Value);
+                    localFontFile.Ascent += (byte)maxHeightOffset;
+                    localFontFile.Height += (byte)maxHeightOffset;
+                    foreach (var cdata in localFontFile.Characters)
+                    {
+                        int HeightOffset = maxHeightOffset;
+                        if (BumpsNeeded.ContainsKey(cdata.Key))
+                            HeightOffset = BumpsNeeded[cdata.Key];
+
+                        cdata.Value.RectY0 += (byte)HeightOffset;
                     }
                 }
 
