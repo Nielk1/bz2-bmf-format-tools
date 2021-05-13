@@ -74,7 +74,6 @@
             this.fromFontToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.newToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openFileDialog2 = new System.Windows.Forms.OpenFileDialog();
-            this.addFontToSystemTeporarilyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.flowLayoutPanel1.SuspendLayout();
@@ -118,8 +117,7 @@
             this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.openToolStripMenuItem,
             this.newToolStripMenuItem,
-            this.fromFontToolStripMenuItem,
-            this.addFontToSystemTeporarilyToolStripMenuItem});
+            this.fromFontToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
             this.fileToolStripMenuItem.Text = "File";
@@ -619,13 +617,6 @@
             this.openFileDialog2.FileName = "openFileDialog2";
             this.openFileDialog2.Filter = "Font File|*.ttf";
             // 
-            // addFontToSystemTeporarilyToolStripMenuItem
-            // 
-            this.addFontToSystemTeporarilyToolStripMenuItem.Name = "addFontToSystemTeporarilyToolStripMenuItem";
-            this.addFontToSystemTeporarilyToolStripMenuItem.Size = new System.Drawing.Size(243, 22);
-            this.addFontToSystemTeporarilyToolStripMenuItem.Text = "Add Font to System Temporarily";
-            this.addFontToSystemTeporarilyToolStripMenuItem.Click += new System.EventHandler(this.addFontToSystemTeporarilyToolStripMenuItem_Click);
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -723,7 +714,6 @@
         private System.Windows.Forms.ToolStripMenuItem fromFontToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem newToolStripMenuItem;
         private System.Windows.Forms.OpenFileDialog openFileDialog2;
-        private System.Windows.Forms.ToolStripMenuItem addFontToSystemTeporarilyToolStripMenuItem;
     }
 }
 

@@ -425,7 +425,7 @@ namespace Nielk1.Tools.Battlezone.FontEditor
                                 BmfCharacter Character = new BmfCharacter(
                                     (byte)characterWidth, // entire width of character
                                     (byte)gmptGlyphOrigin_x, // black area x0
-                                    (byte)heightPixel - gmptGlyphOrigin_y, // black area y0
+                                    (byte)(heightPixel - gmptGlyphOrigin_y), // black area y0
                                     (byte)(gmptGlyphOrigin_x + (BlackZone?.Width ?? 0)), // black area x1
                                     (byte)((heightPixel - gmptGlyphOrigin_y) + (BlackZone?.Height ?? 0)), // black area y1
                                     (byte)(BlackZone?.Width ?? 0), // black area width
