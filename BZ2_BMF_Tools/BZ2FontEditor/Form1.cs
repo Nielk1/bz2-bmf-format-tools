@@ -205,11 +205,17 @@ namespace Nielk1.Tools.Battlezone.FontEditor
             const int bias = 0x40;
             for (int i = 0; i < size; i++)
             {
-                byte v = (byte)((int)alpha[i] * 255 / bias);
-                bmpValues[i * 4 + 0] = 0xff;
-                bmpValues[i * 4 + 1] = 0xff;
-                bmpValues[i * 4 + 2] = 0xff;
-                bmpValues[i * 4 + 3] = v;
+                try
+                {
+                    byte v = (byte)((int)alpha[i] * 255 / bias);
+                    bmpValues[i * 4 + 0] = 0xff;
+                    bmpValues[i * 4 + 1] = 0xff;
+                    bmpValues[i * 4 + 2] = 0xff;
+                    bmpValues[i * 4 + 3] = v;
+                }catch(IndexOutOfRangeException) // very odd this happens
+                {
+
+                }
             }
 
             Marshal.Copy(bmpValues, 0, bd.Scan0, bmpSize);
@@ -419,7 +425,7 @@ namespace Nielk1.Tools.Battlezone.FontEditor
                                 BmfCharacter Character = new BmfCharacter(
                                     (byte)characterWidth, // entire width of character
                                     (byte)gmptGlyphOrigin_x, // black area x0
-                                    (byte)(heightPixel - gmptGlyphOrigin_y), // black area y0
+                                    (byte)heightPixel - gmptGlyphOrigin_y, // black area y0
                                     (byte)(gmptGlyphOrigin_x + (BlackZone?.Width ?? 0)), // black area x1
                                     (byte)((heightPixel - gmptGlyphOrigin_y) + (BlackZone?.Height ?? 0)), // black area y1
                                     (byte)(BlackZone?.Width ?? 0), // black area width
