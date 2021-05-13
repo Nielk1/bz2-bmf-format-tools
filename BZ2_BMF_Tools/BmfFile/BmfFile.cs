@@ -148,10 +148,10 @@ namespace Nielk1.Formats.Battlezone.BMF
             {
                 output.WriteByte(character.Key);
                 output.WriteByte(character.Value.fullWidth);
-                output.WriteByte(character.Value.rectX0);
-                output.WriteByte(character.Value.rectY0);
-                output.WriteByte(character.Value.rectX1);
-                output.WriteByte(character.Value.rectY1);
+                output.WriteByte(character.Value.RectX0);
+                output.WriteByte(character.Value.RectY0);
+                output.WriteByte(character.Value.RectX1);
+                output.WriteByte(character.Value.RectY1);
             }
             foreach (KeyValuePair<byte, BmfCharacter> character in characters)
             {
@@ -198,17 +198,41 @@ namespace Nielk1.Formats.Battlezone.BMF
         public byte Height
         {
             get { return fontHeight; }
-            set { fontHeight = value; }
+            set
+            {
+                int NewAscent = value - fontDescent;
+                if (NewAscent < 256 && NewAscent >= 0)
+                {
+                    fontHeight = value;
+                    fontAscent = (byte)NewAscent;
+                }
+            }
         }
         public byte Ascent
         {
             get { return fontAscent; }
-            set { fontAscent = value; }
+            set
+            {
+                int NewDescent = fontHeight - value;
+                if (NewDescent < 256 && NewDescent >= 0)
+                {
+                    fontAscent = value;
+                    fontDescent = (byte)NewDescent;
+                }
+            }
         }
         public byte Descent
         {
             get { return fontDescent; }
-            set { fontDescent = value; }
+            set
+            {
+                int NewAscent = fontHeight - value;
+                if (NewAscent < 256 && NewAscent >= 0)
+                {
+                    fontDescent = value;
+                    fontAscent = (byte)NewAscent;
+                }
+            }
         }
 
         public Dictionary<byte, BmfCharacter> Characters
@@ -222,10 +246,64 @@ namespace Nielk1.Formats.Battlezone.BMF
     {
         //byte charValue;// character ascii value
         public byte fullWidth;// full character width
-        public byte rectX0;// left x position in image
-        public byte rectY0;// top y position in image
-        public byte rectX1;// right x position in image
-        public byte rectY1;// bottom y position in image
+        private byte rectX0;// left x position in image
+        private byte rectY0;// top y position in image
+        private byte rectX1;// right x position in image
+        private byte rectY1;// bottom y position in image
+
+        public byte RectX0
+        {
+            get { return rectX0; }
+            set
+            {
+                int newValue = charWidth - value;
+                if (newValue < 256 && newValue >= 0)
+                {
+                    rectX0 = value;
+                    rectX1 = (byte)newValue;
+                }
+            }
+        }
+        public byte RectY0
+        {
+            get { return rectY0; }
+            set
+            {
+                int newValue = charHeight - value;
+                if (newValue < 256 && newValue >= 0)
+                {
+                    rectY0 = value;
+                    rectY1 = (byte)newValue;
+                }
+            }
+        }
+
+        public byte RectX1
+        {
+            get { return rectX1; }
+            set
+            {
+                int newValue = charWidth - value;
+                if (newValue < 256 && newValue >= 0)
+                {
+                    rectX1 = value;
+                    rectX0 = (byte)newValue;
+                }
+            }
+        }
+        public byte RectY1
+        {
+            get { return rectY1; }
+            set
+            {
+                int newValue = charHeight - value;
+                if (newValue < 256 && newValue >= 0)
+                {
+                    rectY1 = value;
+                    rectY0 = (byte)newValue;
+                }
+            }
+        }
 
         public byte charWidth;// width of the character image
         public byte charHeight;// height of the character image

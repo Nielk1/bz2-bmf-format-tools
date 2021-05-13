@@ -70,6 +70,11 @@
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
+            this.fontDialog1 = new System.Windows.Forms.FontDialog();
+            this.fromFontToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.newToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.openFileDialog2 = new System.Windows.Forms.OpenFileDialog();
+            this.addFontToSystemTeporarilyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.flowLayoutPanel1.SuspendLayout();
@@ -111,7 +116,10 @@
             // fileToolStripMenuItem
             // 
             this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.openToolStripMenuItem});
+            this.openToolStripMenuItem,
+            this.newToolStripMenuItem,
+            this.fromFontToolStripMenuItem,
+            this.addFontToSystemTeporarilyToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
             this.fileToolStripMenuItem.Text = "File";
@@ -127,7 +135,6 @@
             // 
             this.openFileDialog1.FileName = "openFileDialog1";
             this.openFileDialog1.Filter = "Battlezone II Bitmap Font|*.bmf";
-            this.openFileDialog1.FileOk += new System.ComponentModel.CancelEventHandler(this.openFileDialog1_FileOk);
             // 
             // label1
             // 
@@ -577,6 +584,7 @@
             // splitContainer2
             // 
             this.splitContainer2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitContainer2.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
             this.splitContainer2.Location = new System.Drawing.Point(0, 0);
             this.splitContainer2.Name = "splitContainer2";
             this.splitContainer2.Orientation = System.Windows.Forms.Orientation.Horizontal;
@@ -591,6 +599,32 @@
             this.splitContainer2.Size = new System.Drawing.Size(362, 199);
             this.splitContainer2.SplitterDistance = 67;
             this.splitContainer2.TabIndex = 37;
+            // 
+            // fromFontToolStripMenuItem
+            // 
+            this.fromFontToolStripMenuItem.Name = "fromFontToolStripMenuItem";
+            this.fromFontToolStripMenuItem.Size = new System.Drawing.Size(243, 22);
+            this.fromFontToolStripMenuItem.Text = "Load System Font";
+            this.fromFontToolStripMenuItem.Click += new System.EventHandler(this.fromFontToolStripMenuItem_Click);
+            // 
+            // newToolStripMenuItem
+            // 
+            this.newToolStripMenuItem.Name = "newToolStripMenuItem";
+            this.newToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.newToolStripMenuItem.Text = "New";
+            this.newToolStripMenuItem.Click += new System.EventHandler(this.newToolStripMenuItem_Click);
+            // 
+            // openFileDialog2
+            // 
+            this.openFileDialog2.FileName = "openFileDialog2";
+            this.openFileDialog2.Filter = "Font File|*.ttf";
+            // 
+            // addFontToSystemTeporarilyToolStripMenuItem
+            // 
+            this.addFontToSystemTeporarilyToolStripMenuItem.Name = "addFontToSystemTeporarilyToolStripMenuItem";
+            this.addFontToSystemTeporarilyToolStripMenuItem.Size = new System.Drawing.Size(243, 22);
+            this.addFontToSystemTeporarilyToolStripMenuItem.Text = "Add Font to System Temporarily";
+            this.addFontToSystemTeporarilyToolStripMenuItem.Click += new System.EventHandler(this.addFontToSystemTeporarilyToolStripMenuItem_Click);
             // 
             // Form1
             // 
@@ -685,6 +719,11 @@
         private System.Windows.Forms.SplitContainer splitContainer1;
         private System.Windows.Forms.SplitContainer splitContainer2;
         private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.FontDialog fontDialog1;
+        private System.Windows.Forms.ToolStripMenuItem fromFontToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem newToolStripMenuItem;
+        private System.Windows.Forms.OpenFileDialog openFileDialog2;
+        private System.Windows.Forms.ToolStripMenuItem addFontToSystemTeporarilyToolStripMenuItem;
     }
 }
 
