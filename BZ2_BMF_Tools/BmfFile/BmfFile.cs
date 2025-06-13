@@ -325,5 +325,70 @@ namespace Nielk1.Formats.Battlezone.BMF
             this.extendedLeftOffset = extendedLeftOffset;
             this.extendedKerningPairs = extendedKerningPairs;
         }
+
+        /// <summary>
+        /// Compact the character by removing empty space around the image data and shifting the offsets.
+        /// </summary>
+        public void Optimize()
+        {
+            int origWidth = charWidth;
+            int origHeight = charHeight;
+            int origRectX0 = rectX0;
+            int origRectY0 = rectY0;
+            int origRectX1 = rectX1;
+            int origRectY1 = rectY1;
+
+            int left = origWidth;
+            int right = -1;
+            int top = origHeight;
+            int bottom = -1;
+
+            for (int y = 0; y < origHeight; y++)
+            {
+                for (int x = 0; x < origWidth; x++)
+                {
+                    if (charData[y * origWidth + x] != 0)
+                    {
+                        if (x < left) left = x;
+                        if (x > right) right = x;
+                        if (y < top) top = y;
+                        if (y > bottom) bottom = y;
+                    }
+                }
+            }
+
+            // check if empty
+            if (left > right || top > bottom)
+            {
+                rectX0 = 0;
+                rectY0 = 0;
+                rectX1 = 0;
+                rectY1 = 0;
+                charWidth = 0;
+                charHeight = 0;
+                charData = new byte[0];
+                return;
+            }
+
+            int newWidth = right - left + 1;
+            int newHeight = bottom - top + 1;
+            byte[] newData = new byte[newWidth * newHeight];
+            for (int y = 0; y < newHeight; y++)
+            {
+                for (int x = 0; x < newWidth; x++)
+                {
+                    newData[y * newWidth + x] = charData[(y + top) * origWidth + (x + left)];
+                }
+            }
+
+            // adjust rects to preserve glyph origin
+            rectX0 = (byte)(origRectX0 + left);
+            rectY0 = (byte)(origRectY0 + top);
+            rectX1 = (byte)(origRectX1 + left);
+            rectY1 = (byte)(origRectY1 + top);
+            charWidth = (byte)newWidth;
+            charHeight = (byte)newHeight;
+            charData = newData;
+        }
     }
 }

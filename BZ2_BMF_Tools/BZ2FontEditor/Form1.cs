@@ -11,6 +11,8 @@ using System.Runtime.InteropServices;
 //using System.Windows.Media;
 using Nielk1.Formats.Battlezone.BMF;
 using System.Drawing.Text;
+using System.IO;
+using System.Windows.Media.Imaging;
 
 namespace Nielk1.Tools.Battlezone.FontEditor
 {
@@ -260,7 +262,7 @@ namespace Nielk1.Tools.Battlezone.FontEditor
 
 
 
-        private String filename;
+        //private String filename;
         private BmfFile FontFile;
         private Font VectorFont;
 
@@ -310,8 +312,39 @@ namespace Nielk1.Tools.Battlezone.FontEditor
         {
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
             {
-                filename = openFileDialog1.FileName;
-                loadSelectedFile();
+                string filename = openFileDialog1.FileName;
+                switch (Path.GetExtension(filename).ToLower())
+                {
+                    case ".ttf":
+                        if (System.IO.File.Exists(filename))
+                        {
+                            PrivateFontCollection fontCol = new PrivateFontCollection();
+                            fontCol.AddFontFile(filename);
+
+                            if (!AddedFonts.Contains(filename))
+                            {
+                                int addedCount = AddFontResource(filename);
+                                if (addedCount > 0)
+                                {
+                                    AddedFonts.Add(filename);
+                                }
+                            }
+                            //LoadVectorFont(new Font(fontCol.Families[0].Name, 12f));
+                            fontDialog1.Font = new Font(fontCol.Families[0].Name, 12f);
+                            if (fontDialog1.ShowDialog() == DialogResult.OK)
+                            {
+                                LoadVectorFont(fontDialog1.Font);
+                            }
+                        }
+                        break;
+                    case ".st":
+                        loadSelectedFileBZ98R(filename);
+                        break;
+                    case ".bmf":
+                    default: // for now assume any unknown is BMF
+                        loadSelectedFile(filename);
+                        break;
+                }
             }
         }
 
@@ -345,11 +378,19 @@ namespace Nielk1.Tools.Battlezone.FontEditor
         {
             VectorFont = inputFont;
 
-            if (FontFile != null)
-            {
-                // adding to existing font
-            }
-            else
+            //if (FontFile != null)
+            //{
+            //    // adding to existing font
+            //}
+            //else
+
+            listBox1.Items.Clear();
+
+            pictureBox1.Image = null;
+            pictureBox2.Image = null;
+            pictureBox3.Image = null;
+            imgWords.Image = null;
+
             {
                 // font from 0
                 int Ascent = VectorFont.FontFamily.GetCellAscent(VectorFont.Style);
@@ -489,7 +530,7 @@ namespace Nielk1.Tools.Battlezone.FontEditor
             UpdateTextPreview();
         }
 
-        private void loadSelectedFile()
+        private void loadSelectedFile(string filename)
         {
             if (System.IO.File.Exists(filename))
             {
@@ -502,9 +543,131 @@ namespace Nielk1.Tools.Battlezone.FontEditor
                 imgWords.Image = null;
                 // />
 
-                string ExtendedFile = System.IO.Path.ChangeExtension(filename, ".bm2");
+                if (!System.IO.File.Exists(filename))
+                    return;
 
-                LoadFontFile(System.IO.File.Exists(ExtendedFile) ? new BmfFile(System.IO.File.OpenRead(filename), System.IO.File.OpenRead(ExtendedFile)) : new BmfFile(System.IO.File.OpenRead(filename)));
+                System.IO.Stream MainFont = System.IO.File.OpenRead(filename);
+                
+                string ExtendedFile = System.IO.Path.ChangeExtension(filename, ".bm2");
+                System.IO.Stream ExtendedFont = null;
+                if (System.IO.File.Exists(ExtendedFile))
+                    ExtendedFont = System.IO.File.OpenRead(ExtendedFile);
+                LoadFontFile(new BmfFile(MainFont, ExtendedFont));
+            }
+        }
+
+        private struct BZ98R_Sprite_Data
+        {
+            public string material;
+            public int u;
+            public int v;
+            public int w;
+            public int h;
+            public int ref_w;
+            public int ref_h;
+        }
+
+        private void loadSelectedFileBZ98R(string filename)
+        {
+            if (System.IO.File.Exists(filename))
+            {
+                // unload anything loaded?
+                listBox1.Items.Clear();
+
+                pictureBox1.Image = null;
+                pictureBox2.Image = null;
+                pictureBox3.Image = null;
+                imgWords.Image = null;
+                // />
+
+                if (!System.IO.File.Exists(filename))
+                    return;
+
+                //string ExtendedFile = System.IO.Path.ChangeExtension(filename, ".png");
+
+                string[] lines = File.ReadAllLines(filename);
+                BZ98R_Sprite_Data[] data = new BZ98R_Sprite_Data[256];
+                Dictionary<string, Bitmap> images = new Dictionary<string, Bitmap>();
+
+                foreach (string[] line in lines.Select(dr => dr.Split('#')[0].Trim()).Where(dr => dr.Length > 0).Select(dr => dr.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries)))
+                {
+                    int idx = int.Parse(line[0].Trim('"').Split('.')[1]);
+                    string material = line[1].Trim('"');
+                    //int pad = 1024 / int.Parse(line[6]);
+                    int u = int.Parse(line[2]);// * pad;
+                    int v = int.Parse(line[3]);// * pad;
+                    int w = int.Parse(line[4]);// * pad;
+                    int h = int.Parse(line[5]);// * pad;
+                    int ref_w = int.Parse(line[6]);
+                    int ref_h = int.Parse(line[7]);
+                    data[idx] = new BZ98R_Sprite_Data()
+                    {
+                        material = material,
+                        u = u,
+                        v = v,
+                        w = w,
+                        h = h,
+                        ref_w = ref_w,
+                        ref_h = ref_h
+                    };
+                    if (!images.ContainsKey(material))
+                    {
+                        string imageFile = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(filename), material + ".png");
+                        if (System.IO.File.Exists(imageFile))
+                        {
+                            images[material] = (Bitmap)Bitmap.FromFile(imageFile);
+                        }
+                        else
+                        {
+                            images[material] = null;
+                        }
+                    }
+                }
+                //int maxWidth = data.Max(dr => images[dr.material] != null ? dr.w * images[dr.material].Width / dr.ref_w : 0);
+                int maxHeight = data.Max(dr => images[dr.material] != null ? dr.h * images[dr.material].Height / dr.ref_h : 0);
+
+                BmfFile localFontFile = new BmfFile((byte)maxHeight, 0, 0);
+                for (int i = 0; i < data.Length; i++)
+                {
+                    var dr = data[i];
+                    int width = images[dr.material] != null ? dr.w * images[dr.material].Width / dr.ref_w : 0;
+                    int sidePad = images[dr.material] != null ? 8 * images[dr.material].Width / dr.ref_w : 0;
+                    int height = images[dr.material] != null ? dr.h * images[dr.material].Height / dr.ref_h : 0;
+                    int u = images[dr.material] != null ? dr.u * images[dr.material].Width / dr.ref_w : 0;
+                    int v = images[dr.material] != null ? dr.v * images[dr.material].Height / dr.ref_h : 0;
+                    if (width > 0 && height > 0)
+                    {
+                        byte[] rawData = new byte[width * height];
+                        if (images[dr.material] != null)
+                        {
+                            Bitmap bmp = images[dr.material];
+                            for (int y = 0; y < height; y++)
+                                for (int x = 0; x < width; x++)
+                                {
+                                    int sx = u + x;
+                                    int sy = v + y;
+                                    if (sx >= 0 && sx < bmp.Width && sy >= 0 && sy < bmp.Height)
+                                        rawData[y * width + x] = bmp.GetPixel(sx, sy).A;
+                                    else
+                                        rawData[y * width + x] = 0;
+                                }
+                        }
+                        BmfCharacter Character = new BmfCharacter(
+                            (byte)(width + sidePad), // entire width of character
+                            0, // black area x0
+                            0, // black area y0
+                            (byte)width, // black area x1
+                            (byte)height, // black area y1
+                            (byte)width, // black area width
+                            (byte)height, // black area height
+                            rawData, // black area graphics
+                            0, // left pad
+                            new sbyte[256]); // kerning
+                        Character.Optimize();
+                        localFontFile.Characters.Add((byte)i, Character);
+                    }
+                }
+                LoadFontFile(localFontFile);
             }
         }
 
@@ -556,8 +719,12 @@ namespace Nielk1.Tools.Battlezone.FontEditor
             for (int i = 0; i < 256; i++)
                 ExtendedKerningEdit[i].Value = item.Value.extendedKerningPairs[i];
 
-            FullWidth = Math.Max(FullWidth, (int)(uint)item.Value.RectX1);
-            FullHeight = Math.Max(FullHeight, (int)(uint)item.Value.RectY1);
+            FullWidth = Math.Max(FullWidth, Width);
+            //FullWidth = Math.Max(FullWidth, (int)(uint)item.Value.RectX1);
+            //FullWidth = Math.Max(FullWidth, (int)(uint)item.Value.RectX0 + Width);
+            FullHeight = Math.Max(FullHeight, Height);
+            //FullHeight = Math.Max(FullHeight, (int)(uint)item.Value.RectY1);
+            //FullHeight = Math.Max(FullHeight, (int)(uint)item.Value.RectY0 + Height);
 
             lblCharWidth.Text = "" + Width;
             lblCharHeight.Text = "" + Height;
@@ -570,9 +737,33 @@ namespace Nielk1.Tools.Battlezone.FontEditor
 
             if (Height == 0 || Width == 0)
             {
+                Bitmap tmpImage2 = new Bitmap(FullWidth, FullHeight, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
+                Bitmap tmpImage3 = new Bitmap(FullWidth, FullHeight, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+
+                for (int y = 0; y < FullHeight; y++)
+                {
+                    for (int x = 0; x < FullWidth; x++)
+                    {
+                        tmpImage2.SetPixel(x, y, Color.Magenta);
+                    }
+                }
+                for (int y = 0; y < FullHeight; y++)
+                {
+                    for (int x = 0; x < FullWidth; x++)
+                    {
+                        tmpImage3.SetPixel(x, y, Color.Transparent);
+                    }
+                }
+
+                pictureBox1.Width = 0;
+                pictureBox1.Height = 0;
                 pictureBox1.Image = null;
-                pictureBox2.Image = null;
-                pictureBox3.Image = null;
+                pictureBox2.Width = tmpImage2.Width;
+                pictureBox2.Height = tmpImage2.Height;
+                pictureBox2.Image = tmpImage2;
+                pictureBox3.Width = tmpImage3.Width;
+                pictureBox3.Height = tmpImage3.Height;
+                pictureBox3.Image = tmpImage3;
             }
             else
             {
@@ -600,12 +791,12 @@ namespace Nielk1.Tools.Battlezone.FontEditor
                 {
                     for (int x = 0; x < Width; x++)
                     {
+                        if (XOffset + x >= FullWidth)
+                            continue;
+                        if (YOffset + y >= FullHeight)
+                            continue;
                         int z = 255 - item.Value.charData[y * Width + x];
-                        try
-                        {
-                            tmpImage2.SetPixel(XOffset + x, YOffset + y, Color.FromArgb(255, z, z, z));
-                        }
-                        catch { }
+                        tmpImage2.SetPixel(XOffset + x, YOffset + y, Color.FromArgb(255, z, z, z));
                     }
                 }
                 ////////////////////////
@@ -620,12 +811,12 @@ namespace Nielk1.Tools.Battlezone.FontEditor
                 {
                     for (int x = 0; x < Width; x++)
                     {
-                        try
-                        {
-                            int z = item.Value.charData[y * Width + x];
-                            tmpImage3.SetPixel(XOffset + x, YOffset + y, Color.FromArgb(z, 0, 0, 0));
-                        }
-                        catch { }
+                        if (XOffset + x >= FullWidth)
+                            continue;
+                        if (YOffset + y >= FullHeight)
+                            continue;
+                        int z = item.Value.charData[y * Width + x];
+                        tmpImage3.SetPixel(XOffset + x, YOffset + y, Color.FromArgb(z, 0, 0, 0));
                     }
                 }
 
@@ -776,12 +967,13 @@ namespace Nielk1.Tools.Battlezone.FontEditor
                                         int z = dataForChar.charData[yInner * LetterWidth + xInner];
                                         if (runningWidth + LetterXOffset + xInner < Width && (lineNum * FontFile.Height) + LetterYOffset + yInner < Height)
                                         {
+                                            int x = runningWidth + LetterXOffset + xInner;
+                                            if (x < 0) continue;
+                                            int y = (lineNum * FontFile.Height) + LetterYOffset + yInner;
                                             int DrawOverColor = DrawOver
-                                                ? myImage.GetPixel(runningWidth + LetterXOffset + xInner, (lineNum * FontFile.Height) + LetterYOffset + yInner).A
+                                                ? myImage.GetPixel(x, y).A
                                                 : 0;
-                                            myImage.SetPixel(runningWidth + LetterXOffset + xInner,
-                                                (lineNum * FontFile.Height) + LetterYOffset + yInner,
-                                                Color.FromArgb(Math.Min(DrawOverColor + z, 255), 0, 0, 0));
+                                            myImage.SetPixel(x, y, Color.FromArgb(Math.Min(DrawOverColor + z, 255), 0, 0, 0));
                                         }
                                         else
                                         {
