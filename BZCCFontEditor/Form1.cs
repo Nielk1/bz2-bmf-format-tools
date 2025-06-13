@@ -1,20 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Windows.Forms;
+﻿using System.Data;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
-//using System.Windows.Media;
 using Nielk1.Formats.Battlezone.BMF;
 using System.Drawing.Text;
-using System.IO;
-using System.Windows.Media.Imaging;
+using Newtonsoft.Json;
 
-namespace Nielk1.Tools.Battlezone.FontEditor
+namespace BZCCFontEditor
 {
     public partial class Form1 : Form
     {
@@ -140,7 +131,7 @@ namespace Nielk1.Tools.Battlezone.FontEditor
         //    }
         //}
 
-        private Bitmap GetGlyphBitmap(char letter, Font font, out GLYPHMETRICS gm)
+        private Bitmap? GetGlyphBitmap(char letter, Font font, out GLYPHMETRICS gm)
         //public static Image GetGlyphOutlineImage(Font font, char ch, out GLYPHMETRICS gm)
         {
             byte[] alpha;
@@ -338,6 +329,7 @@ namespace Nielk1.Tools.Battlezone.FontEditor
                         }
                         break;
                     case ".st":
+                    case ".sta":
                         loadSelectedFileBZ98R(filename);
                         break;
                     case ".bmf":
@@ -345,6 +337,8 @@ namespace Nielk1.Tools.Battlezone.FontEditor
                         loadSelectedFile(filename);
                         break;
                 }
+                if (string.IsNullOrEmpty(saveFileDialog1.FileName))
+                    saveFileDialog1.FileName = Path.GetDirectoryName(filename);
             }
         }
 
@@ -400,7 +394,7 @@ namespace Nielk1.Tools.Battlezone.FontEditor
                         {
                             //GLYPHMETRICS? metric = GetGlyphMetrics((char)i, VectorFont);
                             GLYPHMETRICS ImageMetric;
-                            Bitmap BlackZone = GetGlyphBitmap((char)i, VectorFont, out ImageMetric);
+                            Bitmap? BlackZone = GetGlyphBitmap((char)i, VectorFont, out ImageMetric);
                             if (ImageMetric.gmCellIncX > 0 || BlackZone != null)
                             {
                                 //Bitmap canvas = new Bitmap(metric.Value.gmCellIncX - metric.Value.gmptGlyphOrigin.x, heightPixel);
@@ -1089,6 +1083,274 @@ namespace Nielk1.Tools.Battlezone.FontEditor
                             return;
                         }
                     }
+                }
+            }
+        }
+
+
+        class JSONOutputObject
+        {
+            public byte fontHeight { get; set; }
+            public byte fontAscent { get; set; }
+            public byte fontDescent { get; set; }
+        }
+        class JSONOutputObject2
+        {
+            public sbyte extendedLeftOffset { get; set; }
+            public sbyte[] extendedKerningPairs { get; set; }
+        }
+
+        private void importToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (openFileDialog2.ShowDialog() == DialogResult.OK)
+            {
+                string decriptionF = openFileDialog2.FileName;
+                string? filename = Path.GetDirectoryName(decriptionF);
+                if (filename == null) return;
+
+                string prefix = Path.Combine(filename, Path.GetFileNameWithoutExtension(decriptionF) + "_");
+
+                if (File.Exists(decriptionF))
+                {
+                    string description;
+                    using (StreamReader descriptionR = File.OpenText(decriptionF))
+                    {
+                        description = descriptionR.ReadToEnd();
+                    }
+                    if (description == null) return;
+
+                    JSONOutputObject? data = JsonConvert.DeserializeObject<JSONOutputObject>(description);
+
+                    if (data == null) return;
+
+                    BmfFile FontFile = new BmfFile(data.fontHeight, data.fontAscent, data.fontDescent);
+
+                    for (int x = 0; x < 256; x++)
+                    {
+                        string imageFilename = prefix + Convert.ToString(x, 16).PadLeft(2, '0') + @".bmp";
+
+                        string dataFilename = prefix + Convert.ToString(x, 16).PadLeft(2, '0') + @".json";
+
+                        string? description2 = null;
+                        if (File.Exists(dataFilename))
+                            using (StreamReader descriptionR = File.OpenText(dataFilename))
+                                description2 = descriptionR.ReadToEnd();
+                        JSONOutputObject2? data2 = null;
+                        if (description2 != null)
+                            data2 = JsonConvert.DeserializeObject<JSONOutputObject2>(description2);
+
+                        if (File.Exists(imageFilename))
+                        {
+                            using (Bitmap thisLetter = (Bitmap)Bitmap.FromFile(imageFilename))
+                            {
+                                int Height = thisLetter.Size.Height;
+                                int Width = thisLetter.Size.Width;
+                                int FullWidth = Width;
+
+                                int OffsetX0 = 0;
+                                int OffsetY0 = 0;
+                                int OffsetX1 = Width;
+                                int OffsetY1 = Height;
+
+                                Console.WriteLine("Processing letter: " + (uint)x + "\t" + Convert.ToString(x, 16) + "\t" + (!char.IsControl((char)x) ? "" + (char)x : ""));
+
+                                bool nonWhiteLine = false;
+                                for (int Iy = 0; Iy < Height; Iy++)
+                                {
+                                    for (int Ix = 0; Ix < Width; Ix++)
+                                    {
+                                        if (thisLetter.GetPixel(Ix, Iy).R != 0xFF)
+                                        {
+                                            nonWhiteLine = true;
+                                            OffsetY0 = Iy;
+                                            break;
+                                        }
+                                    }
+                                    if (nonWhiteLine) break;
+                                }
+                                Console.WriteLine("Got OffsetY0: " + OffsetY0);
+
+                                nonWhiteLine = false;
+                                for (int Iy = Height - 1; Iy >= 0; Iy--)
+                                {
+                                    for (int Ix = 0; Ix < Width; Ix++)
+                                    {
+                                        if (thisLetter.GetPixel(Ix, Iy).R != 0xFF)
+                                        {
+                                            nonWhiteLine = true;
+                                            OffsetY1 = Iy + 1;
+                                            break;
+                                        }
+                                    }
+                                    if (nonWhiteLine) break;
+                                }
+                                if (!nonWhiteLine) OffsetY1 = 0;
+                                Console.WriteLine("Got OffsetY1: " + OffsetY1);
+
+                                nonWhiteLine = false;
+                                for (int Ix = 0; Ix < Width; Ix++)
+                                {
+                                    for (int Iy = 0; Iy < Height; Iy++)
+                                    {
+                                        if (thisLetter.GetPixel(Ix, Iy).R != 0xFF)
+                                        {
+                                            nonWhiteLine = true;
+                                            OffsetX0 = Ix;
+                                            break;
+                                        }
+                                    }
+                                    if (nonWhiteLine) break;
+                                }
+                                Console.WriteLine("Got OffsetX0: " + OffsetX0);
+
+                                nonWhiteLine = false;
+                                for (int Ix = Width - 1; Ix >= 0; Ix--)
+                                {
+                                    for (int Iy = 0; Iy < Height; Iy++)
+                                    {
+                                        if (thisLetter.GetPixel(Ix, Iy).R != 0xFF)
+                                        {
+                                            nonWhiteLine = true;
+                                            OffsetX1 = Ix + 1;
+                                            break;
+                                        }
+                                    }
+                                    if (nonWhiteLine) break;
+                                }
+                                if (!nonWhiteLine) OffsetX1 = 0;
+                                Console.WriteLine("Got OffsetX1: " + OffsetX1);
+
+                                int croppedWidth = OffsetX1 - OffsetX0;
+                                int croppedHeight = OffsetY1 - OffsetY0;
+
+                                if (croppedWidth < 0 || croppedHeight < 0)
+                                {
+                                    Console.WriteLine("wtf");
+                                }
+
+                                byte[] colorBytes = new byte[croppedWidth * croppedHeight];
+
+                                for (int Iy = OffsetY0; Iy < OffsetY1; Iy++)
+                                {
+                                    for (int Ix = OffsetX0; Ix < OffsetX1; Ix++)
+                                    {
+                                        colorBytes[(Iy - OffsetY0) * croppedWidth + (Ix - OffsetX0)] = (byte)(255 - thisLetter.GetPixel(Ix, Iy).R);
+                                    }
+                                }
+                                FontFile.Characters.Add((byte)x, new BmfCharacter(
+                                    (byte)FullWidth,
+                                    (byte)OffsetX0,
+                                    (byte)OffsetY0,
+                                    (byte)OffsetX1,
+                                    (byte)OffsetY1,
+                                    (byte)croppedWidth,
+                                    (byte)croppedHeight,
+                                    colorBytes,
+                                    data2?.extendedLeftOffset ?? 0,
+                                    data2?.extendedKerningPairs ?? new sbyte[256]));
+
+                                Console.WriteLine("------------");
+                            }
+                        }
+                    }
+
+                    LoadFontFile(FontFile);
+                }
+            }       
+        }
+
+        private void exportToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (saveFileDialog2.ShowDialog() == DialogResult.OK)
+            {
+                string filename = saveFileDialog2.FileName;
+
+                string saveLocation = Path.GetDirectoryName(filename);
+                if (saveLocation == null)
+                    return;
+
+                JSONOutputObject outputObj = new JSONOutputObject()
+                {
+                    fontHeight = FontFile.Height,
+                    fontAscent = FontFile.Ascent,
+                    fontDescent = FontFile.Descent,
+                };
+
+                string prefix = Path.Combine(saveLocation, Path.GetFileNameWithoutExtension(filename) + "_");
+
+                string output = JsonConvert.SerializeObject(outputObj);
+                using (StreamWriter fileWriter = File.CreateText(filename))
+                {
+                    fileWriter.Write(output);
+                }
+
+                foreach (KeyValuePair<byte, BmfCharacter> character in FontFile.Characters)
+                {
+                    int keyVal = (int)(uint)character.Key;
+
+                    int Width = (int)(uint)character.Value.charWidth;
+                    int Height = (int)(uint)character.Value.charHeight;
+
+                    int FullWidth = (int)(uint)character.Value.fullWidth;
+                    int FullHeight = (int)(uint)FontFile.Height;
+                    int XOffset = (int)(uint)character.Value.RectX0;
+                    int YOffset = (int)(uint)character.Value.RectY0;
+
+                    FullWidth = Math.Max(FullWidth, (int)(uint)character.Value.RectX1);
+                    FullHeight = Math.Max(FullHeight, (int)(uint)character.Value.RectY1);
+
+                    string outputIDString = Convert.ToString(keyVal, 16).PadLeft(2, '0');
+
+                    if (FullWidth == 0 || FullWidth == 0)
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        Bitmap tmpImage = new Bitmap(FullWidth, FullHeight, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
+                        for (int y = 0; y < FullHeight; y++)
+                        {
+                            for (int x = 0; x < FullWidth; x++)
+                            {
+                                tmpImage.SetPixel(x, y, Color.White);
+                            }
+                        }
+                        for (int y = 0; y < Height; y++)
+                        {
+                            for (int x = 0; x < Width; x++)
+                            {
+                                int z = 255 - character.Value.charData[y * Width + x];
+                                tmpImage.SetPixel(XOffset + x, YOffset + y, Color.FromArgb(255, z, z, z));
+                            }
+                        }
+                        tmpImage.Save(prefix + outputIDString + @".bmp");
+
+                        JSONOutputObject2 outputObj2 = new JSONOutputObject2()
+                        {
+                            extendedLeftOffset = character.Value.extendedLeftOffset,
+                            extendedKerningPairs = character.Value.extendedKerningPairs,
+                        };
+                        string output2 = JsonConvert.SerializeObject(outputObj2);
+                        using (StreamWriter fileWriter = File.CreateText(prefix + outputIDString + @".json"))
+                        {
+                            fileWriter.Write(output2);
+                        }
+                    }
+                }
+            }
+        }
+
+        private void toolStripMenuItem2_Click(object sender, EventArgs e)
+        {
+            if (saveFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+                string bmfFilename = saveFileDialog1.FileName;
+                bmfFilename = Path.ChangeExtension(bmfFilename, ".bmf");
+                string bm2Filename = Path.ChangeExtension(bmfFilename, ".bm2");
+                using (FileStream bmfStream = File.Create(bmfFilename))
+                using (FileStream bm2Stream = File.Create(bm2Filename))
+                {
+                    FontFile.Write(bmfStream, bm2Stream);
                 }
             }
         }

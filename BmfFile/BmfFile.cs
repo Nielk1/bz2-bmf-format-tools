@@ -55,7 +55,7 @@ namespace Nielk1.Formats.Battlezone.BMF
 
         private Dictionary<byte, BmfCharacter> characters;
 
-        public BmfFile(Stream fileStream, Stream extendedFile = null)
+        public BmfFile(Stream fileStream, Stream? extendedFile = null)
         {
             using (fileStream)
             {
@@ -94,16 +94,23 @@ namespace Nielk1.Formats.Battlezone.BMF
                     if (extendedFile == null)
                     {
                         charExtension[x].leftOffset = (sbyte)0x00;
-                        charExtension[x].kerningPairs = new sbyte[256];
-                        //for (uint y = 0; y < 256; y++)
-                        //    charHeaders[x].extendedKerningPairs[y] = (sbyte)0x00;
                     }
                     else
                     {
-                        charExtension[x].leftOffset = (sbyte)extendedFile?.ReadByte();
+                        charExtension[x].leftOffset = (sbyte)(extendedFile?.ReadByte() ?? 0);
+                    }
+                }
+                for (uint x = 0; x < 256; x++)
+                {
+                    if (extendedFile == null)
+                    {
+                        charExtension[x].kerningPairs = new sbyte[256];
+                    }
+                    else
+                    {
                         charExtension[x].kerningPairs = new sbyte[256];
                         for (uint y = 0; y < 256; y++)
-                            charExtension[x].kerningPairs[y] = (sbyte)extendedFile?.ReadByte();
+                            charExtension[x].kerningPairs[y] = (sbyte)(extendedFile?.ReadByte() ?? 0);
                     }
                 }
 
@@ -175,11 +182,11 @@ namespace Nielk1.Formats.Battlezone.BMF
                 {
                     if (!characters.ContainsKey((byte)i))
                     {
-                        for (int j = 0; i < 256; j++)
+                        for (int j = 0; j < 256; j++)
                             output2.WriteByte(0x00);
                         continue;
                     }
-                    for (int j = 0; i < 256; j++)
+                    for (int j = 0; j < 256; j++)
                         output2.WriteByte((byte)characters[(byte)i].extendedKerningPairs[j]);
                 }
             }
