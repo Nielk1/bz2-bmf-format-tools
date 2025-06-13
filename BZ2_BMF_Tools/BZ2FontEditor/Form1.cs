@@ -356,24 +356,6 @@ namespace Nielk1.Tools.Battlezone.FontEditor
             }
         }
 
-        private void addFontToSystemTeporarilyToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            if (openFileDialog2.ShowDialog() == DialogResult.OK)
-            {
-                if (System.IO.File.Exists(openFileDialog2.FileName))
-                {
-                    if (!AddedFonts.Contains(openFileDialog2.FileName))
-                    {
-                        int addedCount = AddFontResource(openFileDialog2.FileName);
-                        if (addedCount > 0)
-                        {
-                            AddedFonts.Add(openFileDialog2.FileName);
-                        }
-                    }
-                }
-            }
-        }
-
         private void LoadVectorFont(Font inputFont)
         {
             VectorFont = inputFont;

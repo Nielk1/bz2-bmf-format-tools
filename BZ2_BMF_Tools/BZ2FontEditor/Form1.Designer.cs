@@ -66,7 +66,6 @@
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
             this.fontDialog1 = new System.Windows.Forms.FontDialog();
-            this.openFileDialog2 = new System.Windows.Forms.OpenFileDialog();
             this.splitContainer3 = new System.Windows.Forms.SplitContainer();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.panel1 = new System.Windows.Forms.Panel();
@@ -534,11 +533,6 @@
             this.splitContainer2.SplitterDistance = 67;
             this.splitContainer2.TabIndex = 37;
             // 
-            // openFileDialog2
-            // 
-            this.openFileDialog2.FileName = "openFileDialog2";
-            this.openFileDialog2.Filter = "Font File|*.ttf";
-            // 
             // splitContainer3
             // 
             this.splitContainer3.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -597,7 +591,7 @@
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
             this.tableLayoutPanel1.RowCount = 1;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(32, 113);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(143, 98);
             this.tableLayoutPanel1.TabIndex = 0;
             // 
             // flowLayoutPanel1
@@ -734,7 +728,6 @@
         private System.Windows.Forms.FontDialog fontDialog1;
         private System.Windows.Forms.ToolStripMenuItem fromFontToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem newToolStripMenuItem;
-        private System.Windows.Forms.OpenFileDialog openFileDialog2;
         private System.Windows.Forms.SplitContainer splitContainer3;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.Panel panel1;
