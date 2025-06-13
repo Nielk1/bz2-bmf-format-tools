@@ -814,6 +814,7 @@ namespace BZCCFontEditor
                 pictureBox3.Width = tmpImage3.Width;
                 pictureBox3.Height = tmpImage3.Height;
                 pictureBox3.Image = tmpImage3;
+                splitContainer3.SplitterDistance = splitContainer3.Height - tmpImage3.Height - 10;
             }
             else
             {
@@ -879,6 +880,7 @@ namespace BZCCFontEditor
                 pictureBox3.Width = tmpImage3.Width;
                 pictureBox3.Height = tmpImage3.Height;
                 pictureBox3.Image = tmpImage3;
+                splitContainer3.SplitterDistance = splitContainer3.Height - tmpImage3.Height - 10;
             }
         }
 
