@@ -4,6 +4,8 @@ using System.Runtime.InteropServices;
 using Nielk1.Formats.Battlezone.BMF;
 using System.Drawing.Text;
 using Newtonsoft.Json;
+using static System.Windows.Forms.DataFormats;
+using System.Reflection.Metadata;
 
 namespace BZCCFontEditor
 {
@@ -563,7 +565,7 @@ namespace BZCCFontEditor
 
                 string[] lines = File.ReadAllLines(filename);
                 BZ98R_Sprite_Data[] data = new BZ98R_Sprite_Data[256];
-                Dictionary<string, Bitmap> images = new Dictionary<string, Bitmap>();
+                Dictionary<string, Bitmap?> images = new Dictionary<string, Bitmap?>();
 
                 foreach (string[] line in lines.Select(dr => dr.Split('#')[0].Trim()).Where(dr => dr.Length > 0).Select(dr => dr.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries)))
                 {
@@ -589,9 +591,81 @@ namespace BZCCFontEditor
                     if (!images.ContainsKey(material))
                     {
                         string imageFile = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(filename), material + ".png");
+                        string imageFile2 = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(filename), material + ".dds");
                         if (System.IO.File.Exists(imageFile))
                         {
-                            images[material] = (Bitmap)Bitmap.FromFile(imageFile);
+                            images[material] = (Bitmap)System.Drawing.Bitmap.FromFile(imageFile);
+                        }
+                        else if (System.IO.File.Exists(imageFile2))
+                        {
+                            Pfim.IImage _image = Pfim.Pfimage.FromFile(imageFile2);
+                            if (_image.Compressed)
+                                _image.Decompress();
+
+
+                            PixelFormat? format = null;
+                            switch (_image.Format)
+                            {
+                                case Pfim.ImageFormat.Rgb24:
+                                    format = PixelFormat.Format24bppRgb;
+                                    break;
+
+                                case Pfim.ImageFormat.Rgba32:
+                                    format = PixelFormat.Format32bppArgb;
+                                    break;
+
+                                case Pfim.ImageFormat.R5g5b5:
+                                    format = PixelFormat.Format16bppRgb555;
+                                    break;
+
+                                case Pfim.ImageFormat.R5g6b5:
+                                    format = PixelFormat.Format16bppRgb565;
+                                    break;
+
+                                case Pfim.ImageFormat.R5g5b5a1:
+                                    format = PixelFormat.Format16bppArgb1555;
+                                    break;
+
+                                case Pfim.ImageFormat.Rgb8:
+                                    format = PixelFormat.Format8bppIndexed;
+                                    break;
+
+                                default:
+                                    break;
+                            }
+
+                            if (format != null)
+                            {
+                                // Pin image data as the picture box can outlive the Pfim Image
+                                // object, which, unless pinned, will garbage collect the data
+                                // array causing image corruption.
+                                GCHandle handle = GCHandle.Alloc(_image.Data, GCHandleType.Pinned);
+                                var ptr = Marshal.UnsafeAddrOfPinnedArrayElement(_image.Data, 0);
+                                var bitmap = new Bitmap(_image.Width, _image.Height, _image.Stride, format.Value, ptr);
+
+                                // While frameworks like WPF and ImageSharp natively understand 8bit gray values.
+                                // WinForms can only work with an 8bit palette that we construct of gray values.
+                                if (format == PixelFormat.Format8bppIndexed)
+                                {
+                                    var palette = bitmap.Palette;
+                                    for (int i = 0; i < 256; i++)
+                                    {
+                                        palette.Entries[i] = Color.FromArgb((byte)i, (byte)i, (byte)i);
+                                    }
+                                    bitmap.Palette = palette;
+                                }
+
+                                images[material] = bitmap.Clone(new Rectangle(Point.Empty, bitmap.Size), bitmap.PixelFormat);
+
+                                if (handle.IsAllocated)
+                                {
+                                    handle.Free();
+                                }
+                            }
+                            else
+                            {
+                                images[material] = null;
+                            }
                         }
                         else
                         {
@@ -607,7 +681,7 @@ namespace BZCCFontEditor
                 {
                     var dr = data[i];
                     int width = images[dr.material] != null ? dr.w * images[dr.material].Width / dr.ref_w : 0;
-                    int sidePad = images[dr.material] != null ? 8 * images[dr.material].Width / dr.ref_w : 0;
+                    int sidePad = images[dr.material] != null ? 1 * images[dr.material].Width / dr.ref_w : 0;
                     int height = images[dr.material] != null ? dr.h * images[dr.material].Height / dr.ref_h : 0;
                     int u = images[dr.material] != null ? dr.u * images[dr.material].Width / dr.ref_w : 0;
                     int v = images[dr.material] != null ? dr.v * images[dr.material].Height / dr.ref_h : 0;
@@ -1141,7 +1215,7 @@ namespace BZCCFontEditor
 
                         if (File.Exists(imageFilename))
                         {
-                            using (Bitmap thisLetter = (Bitmap)Bitmap.FromFile(imageFilename))
+                            using (Bitmap thisLetter = (Bitmap)System.Drawing.Bitmap.FromFile(imageFilename))
                             {
                                 int Height = thisLetter.Size.Height;
                                 int Width = thisLetter.Size.Width;

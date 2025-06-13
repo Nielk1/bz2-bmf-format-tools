@@ -447,7 +447,7 @@
             imgWords.Location = new Point(4, 3);
             imgWords.Margin = new Padding(4, 3, 4, 3);
             imgWords.Name = "imgWords";
-            imgWords.Size = new Size(414, 140);
+            imgWords.Size = new Size(414, 139);
             imgWords.TabIndex = 34;
             imgWords.TabStop = false;
             // 
@@ -537,7 +537,7 @@
             // 
             splitContainer3.Panel2.Controls.Add(flowLayoutPanel1);
             splitContainer3.Size = new Size(217, 231);
-            splitContainer3.SplitterDistance = 150;
+            splitContainer3.SplitterDistance = 149;
             splitContainer3.SplitterWidth = 5;
             splitContainer3.TabIndex = 37;
             // 
@@ -549,7 +549,7 @@
             groupBox1.Margin = new Padding(4, 3, 4, 3);
             groupBox1.Name = "groupBox1";
             groupBox1.Padding = new Padding(4, 3, 4, 3);
-            groupBox1.Size = new Size(210, 143);
+            groupBox1.Size = new Size(210, 142);
             groupBox1.TabIndex = 37;
             groupBox1.TabStop = false;
             groupBox1.Text = "Kerning Pair";
@@ -562,7 +562,7 @@
             panel1.Location = new Point(7, 21);
             panel1.Margin = new Padding(4, 3, 4, 3);
             panel1.Name = "panel1";
-            panel1.Size = new Size(196, 115);
+            panel1.Size = new Size(196, 114);
             panel1.TabIndex = 35;
             // 
             // tableLayoutPanel1
@@ -577,7 +577,7 @@
             tableLayoutPanel1.Name = "tableLayoutPanel1";
             tableLayoutPanel1.RowCount = 1;
             tableLayoutPanel1.RowStyles.Add(new RowStyle());
-            tableLayoutPanel1.Size = new Size(152, 113);
+            tableLayoutPanel1.Size = new Size(135, 113);
             tableLayoutPanel1.TabIndex = 0;
             // 
             // flowLayoutPanel1
@@ -589,7 +589,7 @@
             flowLayoutPanel1.Location = new Point(0, 0);
             flowLayoutPanel1.Margin = new Padding(4, 3, 4, 3);
             flowLayoutPanel1.Name = "flowLayoutPanel1";
-            flowLayoutPanel1.Size = new Size(217, 76);
+            flowLayoutPanel1.Size = new Size(217, 77);
             flowLayoutPanel1.TabIndex = 16;
             // 
             // pictureBox3
@@ -672,7 +672,7 @@
             Margin = new Padding(4, 3, 4, 3);
             MinimumSize = new Size(438, 711);
             Name = "Form1";
-            Text = "BZ2 - Font Viewer";
+            Text = "BZ2 - Font Editor";
             menuStrip1.ResumeLayout(false);
             menuStrip1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)nudFontHeight).EndInit();
